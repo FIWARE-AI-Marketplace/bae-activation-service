@@ -1,0 +1,8 @@
+Werkzeug==0.16.0
+Flask==1.1.2
+flask-restplus==0.13.0
+Flask-Script==2.0.6
+Flask-Testing==0.8.0
+requests
+python-benedict
+gunicorn==20.0.4
