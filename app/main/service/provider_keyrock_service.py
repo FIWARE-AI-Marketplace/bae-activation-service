@@ -21,6 +21,9 @@ def assign_role(consumer_id, role):
     KEYROCK_USER = current_app.config['PROVIDER_KEYROCK_USERNAME']
     KEYROCK_PW = current_app.config['PROVIDER_KEYROCK_PASSWORD']
 
+    # Function return value
+    ret_val = {}
+
     # Login via Provider credentials
     url = KEYROCK_URL + '/v1/auth/tokens'
     json_body = """
@@ -65,7 +68,7 @@ def assign_role(consumer_id, role):
         if (not resp) or (not resp.status_code==201) or (not resp.json) or (not resp.json()['role']) or (not resp.json()['role']['id']):
             raise ProviderKeyrockError('Could not create role ' + role + ' in Provider Keyrock')
         role_id = resp.json()['role']['id']
-        
+    ret_val['role_id'] = role_id
     
     # Check if user/org exists
     # --> If not, create user/org
@@ -87,7 +90,7 @@ def assign_role(consumer_id, role):
     if not org_id:
         # Org not found, create it
         org_id = create_org(KEYROCK_URL, consumer_id, provider_token)
-
+    ret_val['org_id'] = org_id
         
     # Assign role to user/org in AppX
     url = KEYROCK_URL + '/v1/applications/{}/organizations/{}/roles/{}/organization_roles/member'.format(KEYROCK_APPID, org_id, role_id)
@@ -95,7 +98,9 @@ def assign_role(consumer_id, role):
     resp = requests.post(url, headers=headers)
     if (not resp) or (not resp.status_code==201) or (not resp.json) or (not resp.json()['role_organization_assignments']):
             raise ProviderKeyrockError('Could not assign role ' + role + ' to organization ' + consumer_id  + ' in Provider Keyrock')
-    
+
+    # Return values
+    return ret_val
 
 def create_org(KEYROCK_URL, consumer_id, provider_token):
     url = KEYROCK_URL + '/v1/organizations'

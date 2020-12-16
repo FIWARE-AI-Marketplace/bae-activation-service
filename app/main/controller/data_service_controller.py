@@ -49,11 +49,12 @@ class ActivateDataService(Resource):
             return response_object, 500
             
         # Assign role in data service Keyrock
+        ret_assign = None
         try:
-            consumer_id = data.get('id')
+            consumer_id = data.get('name')
             role = data.get('role')
             role = role.replace(ROLE_POSTFIX, '') # Remove .admin
-            assign_role(consumer_id, role)
+            ret_assign = assign_role(consumer_id, role)
         except ProviderKeyrockError as err:
             print('Role ' + role + ' could not be assigned to ' + consumer_id + ' in Data Service Keyrock. ' + err.get_message())
             response_object = {
@@ -72,7 +73,9 @@ class ActivateDataService(Resource):
         # Store consumer Keyrock information in API Umbrella
         try:
             secret = data.get('secret')
-            add_idp(consumer_id, secret)
+            endpoint = data.get('endpoint')
+            org_id = ret_assign['org_id']
+            add_idp(consumer_id, org_id, secret, endpoint)
         except ProviderUmbrellaError as err:
             print('IDP could not be added to data service API Umbrella for ' + consumer_id + '. ' + err.get_message())
             response_object = {
