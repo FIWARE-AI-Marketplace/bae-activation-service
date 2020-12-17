@@ -31,9 +31,9 @@ def add_idp(consumer_id, org_id, secret, endpoint):
         "type": "keyrock",
         "endpoint": endpoint,
         "secret": secret
-    } #TODO: Uncomment!!!
-    #resp = requests.post(url, json=body, headers=headers)
-    #if (not resp) or (not resp.status_code==201):
-    #    raise ProviderUmbrellaError('Could not add IDP to API Umbrella')
+    }
+    resp = requests.post(url, json=body, headers=headers)
+    if (not resp) or (not resp.status_code==201):
+        raise ProviderUmbrellaError('Could not add IDP ' + endpoint + ' for ' + consumer_id + ' to API Umbrella')
 
 
