@@ -12,8 +12,7 @@ class ProviderKeyrockError(Exception):
 
 def assign_role(consumer_id, role):
     # Assign role in Provider Keyrock
-    if current_app.config['DEBUG']:
-        print('Assigning role in provider Keyrock. Role: ' + role)
+    current_app.logger.debug('Assigning role in provider Keyrock. Role: ' + role)
 
     # Keyrock config
     KEYROCK_URL = current_app.config['PROVIDER_KEYROCK_SERVER']
@@ -21,6 +20,10 @@ def assign_role(consumer_id, role):
     KEYROCK_USER = current_app.config['PROVIDER_KEYROCK_USERNAME']
     KEYROCK_PW = current_app.config['PROVIDER_KEYROCK_PASSWORD']
 
+    if not KEYROCK_URL or len(KEYROCK_URL) < 1:
+        err_msg = 'Provider Keyrock URL not set'
+        raise ProviderKeyrockError(err_msg)
+    
     # Function return value
     ret_val = {}
 

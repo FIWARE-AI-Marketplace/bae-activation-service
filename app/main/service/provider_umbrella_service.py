@@ -12,14 +12,17 @@ class ProviderUmbrellaError(Exception):
 
 def add_idp(consumer_id, org_id, secret, endpoint):
     # Add consumer IDP in Provider API Umbrella
-    if current_app.config['DEBUG']:
-        print('Adding IDP of consumer ' + consumer_id + ' (OrgID: '+org_id+') with JWT secret in provider API Umbrella.')
+    current_app.logger.debug('Adding IDP of consumer ' + consumer_id + ' (OrgID: '+org_id+') with JWT secret in provider API Umbrella.')
 
     # API Umbrella config
     UMBRELLA_URL = current_app.config['PROVIDER_UMBRELLA_SERVER']
     UMBRELLA_TOKEN = current_app.config['PROVIDER_UMBRELLA_ADMIN_TOKEN']
     UMBRELLA_API_KEY = current_app.config['PROVIDER_UMBRELLA_API_KEY']
 
+    if not UMBRELLA_URL or len(UMBRELLA_URL) < 1:
+        err_msg = 'Provider API Umbrella URL not set'
+        raise ProviderUmbrellaError(err_msg)
+    
     # Add IDP
     url = UMBRELLA_URL + '/api-umbrella/v1/idps'
     headers = {

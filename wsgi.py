@@ -1,5 +1,6 @@
 import os
 import unittest
+import logging
 
 from flask_script import Manager
 
@@ -15,8 +16,19 @@ manager = Manager(app)
 
 @manager.command
 def run():
-    print("--- Starting BAE Activation Service ---")
     app.run()
 
-if __name__ == '__main__':
-    manager.run()
+#if __name__ == '__main__':
+#    print('Main')
+#    gunicorn_logger = logging.getLogger('gunicorn.error')
+#    app.logger.handlers = gunicorn_logger.handlers
+#    app.logger.setLevel(gunicorn_logger.level)
+#    app.logger.error("--- Starting BAE Activation Service ---")
+#    manager.run()
+
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
+    app.logger.info("--- Starting BAE Activation Service on worker node ---")
+    

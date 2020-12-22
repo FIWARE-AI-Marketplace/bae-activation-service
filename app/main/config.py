@@ -22,7 +22,6 @@ class Config:
     PROVIDER_UMBRELLA_ADMIN_TOKEN = os.getenv('PROVIDER_UMBRELLA_ADMIN_TOKEN')
     PROVIDER_UMBRELLA_API_KEY = os.getenv('PROVIDER_UMBRELLA_API_KEY')
     
-    
 class DevelopmentConfig(Config):
     DEBUG = True
 

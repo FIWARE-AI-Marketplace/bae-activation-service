@@ -12,8 +12,7 @@ class MarketplaceKeyrockError(Exception):
 
 def check_role(token, role):
     # Check in Marketplace Keyrock for acquired role
-    if current_app.config['DEBUG']:
-        print('Checking Marketplace role. Token: ' + token + ', Role: ' + role)
+    current_app.logger.debug('Checking Marketplace role. Token: ' + token + ', Role: ' + role)
 
     # Keyrock config
     KEYROCK_URL = current_app.config['BAE_KEYROCK_SERVER']
@@ -21,6 +20,10 @@ def check_role(token, role):
     KEYROCK_USER = current_app.config['BAE_KEYROCK_USERNAME']
     KEYROCK_PW = current_app.config['BAE_KEYROCK_PASSWORD']
 
+    if not KEYROCK_URL or len(KEYROCK_URL) < 1:
+        err_msg = 'Marketplace Keyrock URL not set'
+        raise MarketplaceKeyrockError(err_msg)
+    
     # Obtain user info, extract user ID
     url = KEYROCK_URL + '/user?access_token={}'.format(token)
     resp = requests.get(url)
@@ -69,3 +72,4 @@ def check_role(token, role):
             return True
 
     raise MarketplaceKeyrockError('User has not claimed role ' + role)
+
