@@ -22,21 +22,41 @@ def add_idp(consumer_id, org_id, secret, endpoint):
     if not UMBRELLA_URL or len(UMBRELLA_URL) < 1:
         err_msg = 'Provider API Umbrella URL not set'
         raise ProviderUmbrellaError(err_msg)
-    
-    # Add IDP
+
+    # Check if IDP with this endpoint already exists
     url = UMBRELLA_URL + '/api-umbrella/v1/idps'
     headers = {
         'X-Api-Key': UMBRELLA_API_KEY,
         'X-Admin-Auth-Token': UMBRELLA_TOKEN
     }
+    resp = requests.get(url, headers=headers)
+    if (not resp) or (not resp.status_code==200):
+        raise ProviderUmbrellaError('Could not get list of IDPs from API Umbrella')
+    idp_id = None
+    if resp.json()['data'] and len(resp.json()['data']) > 0:
+        for idp in resp.json()['data']:
+            if idp['endpoint'] == endpoint:
+                idp_id = idp['id']
+                break
+    
+    # Add/Update IDP
+    url = UMBRELLA_URL + '/api-umbrella/v1/idps'
     body = {
         "organization_id": org_id,
         "type": "keyrock",
         "endpoint": endpoint,
         "secret": secret
     }
-    resp = requests.post(url, json=body, headers=headers)
-    if (not resp) or (not resp.status_code==201):
-        raise ProviderUmbrellaError('Could not add IDP ' + endpoint + ' for ' + consumer_id + ' to API Umbrella')
+    if idp_id:
+        # Update IDP
+        url += '/' + idp_id
+        resp = requests.put(url, json=body, headers=headers)
+        if (not resp) or (not resp.status_code==204):
+            raise ProviderUmbrellaError('Could not update IDP ' + endpoint + ' for ' + consumer_id + ' in API Umbrella')
+    else:
+        # Create IDP
+        resp = requests.post(url, json=body, headers=headers)
+        if (not resp) or (not resp.status_code==201):
+            raise ProviderUmbrellaError('Could not add IDP ' + endpoint + ' for ' + consumer_id + ' to API Umbrella')
 
 
